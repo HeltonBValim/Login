@@ -1,0 +1,18 @@
+/* 
+    Criado em : 09/10/2020
+    Autor     : Helton
+*/
+@charset "UTF-8";
+
+html{
+    font: 15pt;
+    font-family: TimesNew Roman, sans-serif;
+}
+body{
+    background-color: black;
+    color: #ffffff;
+}
+
+div{
+    alignment-adjust: central;
+}

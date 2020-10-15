@@ -1,8 +1,9 @@
 <?php
 /*
-Autor : Helton
-Classe Usuario para tratamento de tados da respectiva tabela
+@Autor : HeltonBValim
+Classe Usuario: para operações com dados da respectiva tabela
 Extende a classe Conexoes para acesso ao bd
+Implementa a interface iCrud
 */
 require_once 'iCrud.php';
 require_once 'Conexoes.php';
@@ -34,11 +35,16 @@ class Usuario extends Conexoes implements iCrud{
     bancos instalados. (MySql e PostgreSql)
     Ex. Function inserir na quinta linha*/
     
-    public function resposta() {
+    public function resposta() { #Esta function é a responsável pelo retorno das mensagens do sistema
         echo $this->getRetorno()."<br/>";
     }
     
     public function inserir ($n, $s){
+        /*Executa os inserts de acordo com o tipo do banco.
+        O uso do comando sql escrito direto no código ou armazenado em storage procedures
+        não atrapalha a seleção de bancos diferentes, desde que o nome da SP seja o mesmo
+        em todos os bancos e o número de parâmetros não seja alterado sem a devida revisão
+        no fonte.*/
         $this->setNome($n);
         $this->setSenha($s);
         $this->strsql = ("insert into ".$this->tabela."(nome, senha) values ('" . $this->getNome(). "', '" . $this->getSenha() . "')");
@@ -53,6 +59,9 @@ class Usuario extends Conexoes implements iCrud{
     }
     
     public function deletar($n){
+        /*Deleta todos os registros no banco se o parâmetro '$n' estiver vazio.
+        Apenas para questões ilustrativas e somente em uma base de teste
+        para limpar os dados.*/
         if ($n == ""){
             $this->strsql = ("delete from " . $this->tabela);
         } else {
@@ -69,6 +78,9 @@ class Usuario extends Conexoes implements iCrud{
     }
     
     public function alterar($n, $s) {
+        /*Altera as informações de Senha($s) para o Nome($n) informado.
+        Não há nehhum tipo de tratamento para o texto (lower o upper) seja do nome
+        ou da senha.*/
         $this->setNome($n);
         $this->setSenha($s);
         $this->strsql = ('update tblusuarios set senha='."'".$this->getSenha()."'".' where nome='."'".$this->getNome()."'");
@@ -83,6 +95,11 @@ class Usuario extends Conexoes implements iCrud{
     }
     
     public function consultar($n) {
+        /*Executa a consulta na tabela de usuários.
+        Tras todos os registros caso o parâmetro passado seja vazio.
+        Também para questõe ilustrativas.
+        1. Nos testes os comandos get e set para a variável dados geraram erros.
+        2. A exibição dos dados tem de ser colocados em uma function própria.*/
         $this->setNome($n);
         if ($this->getNome() == '') {
             $this->strsql = ("select * from " . $this->tabela);

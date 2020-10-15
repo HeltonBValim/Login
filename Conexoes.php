@@ -71,6 +71,9 @@ class Conexoes {
      }
     
     private function cnxMySql($simnao){
+        /*Conexão do MySql
+        Se o parâmetro for 'true' inicia uma conexão.
+        caso contrário fecha a conexão ativa.*/
         if ($simnao){
             $this->conexao = new mysqli("$this->mysqlsrv:$this->mysqlprt", "$this->mysqlusr", "$this->mysqlsnh", "$this->mysqldb");
             if (!$this->conexao) {
@@ -85,6 +88,9 @@ class Conexoes {
     }
     
     private function cnxPostgre($simnao){
+        /*Conexão do PostgreSql
+        Se o parâmetro for 'true' inicia uma conexão.
+        caso contrário fecha a conexão ativa.*/
         if ($simnao){
             $this->conexao = pg_connect('host='.$this->postgresrv.' port='.$this->postgreprt.' dbname='.$this->postgredb.' user='.$this->postgreusr.' password='.$this->postgresnh);
             if (!$this->conexao) {

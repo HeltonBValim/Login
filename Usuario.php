@@ -7,7 +7,7 @@ Implementa a interface iCrud
 */
 require_once 'iCrud.php';
 require_once 'Conexoes.php';
-class Usuario extends Conexoes implements iCrud{
+final class Usuario extends Conexoes implements iCrud{
     private $nome;
     private $senha;
     private $strsql;
@@ -35,7 +35,7 @@ class Usuario extends Conexoes implements iCrud{
     bancos instalados. (MySql e PostgreSql)
     Ex. Function inserir na quinta linha*/
     
-    public function resposta() { #Esta function é a responsável pelo retorno das mensagens do sistema
+    public function resposta() { #Esta function é a responsável pelo retorno das mensagens do sistema.
         echo $this->getRetorno()."<br/>";
     }
     
@@ -48,13 +48,11 @@ class Usuario extends Conexoes implements iCrud{
         $this->setNome($n);
         $this->setSenha($s);
         $this->strsql = ("insert into ".$this->tabela."(nome, senha) values ('" . $this->getNome(). "', '" . $this->getSenha() . "')");
-        if ($this->getTipo()=="m"){
-            $this->dados = mysqli_query($this->getConexao(), $this->strsql)or die("Erro na execução do comando: ".mysqli_error());
-        } elseif ($this->getTipo()=="p"){
-            $this->dados = pg_query($this->getConexao(), $this->strsql)or die("Erro na execução do comando: ".pg_result_error());
-        }        
+        $this->executar();
         if ($this->dados == true){
             $this->setRetorno("Inserido com sucesso...");
+        } else {
+            $this->setRetorno("Falha ao executar o comando Inserir...");
         }
     }
     
@@ -67,13 +65,11 @@ class Usuario extends Conexoes implements iCrud{
         } else {
             $this->strsql = ("delete from " . $this->tabela . " where nome=" . "'" . $n . "'");
         }
-        if ($this->getTipo() == "m"){
-            $this->dados = mysqli_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: ".mysqli_error());
-        } elseif ($this->getTipo() == "p") {
-            $this->dados = pg_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: ". pg_result_error());
-        }
+        $this->executar();
         if ($this->dados == true){
             $this->setRetorno("Deletado com sucesso...");
+        } else {
+            $this->setRetorno("Falha ao executar o comando Deletar...");
         }
     }
     
@@ -84,13 +80,11 @@ class Usuario extends Conexoes implements iCrud{
         $this->setNome($n);
         $this->setSenha($s);
         $this->strsql = ('update tblusuarios set senha='."'".$this->getSenha()."'".' where nome='."'".$this->getNome()."'");
-        if ($this->getTipo() == "m"){
-            $this->dados = mysqli_query($this->getConexao(), $this->strsql) or die("Erro na exexução do comando: ".mysqli_error());
-        } elseif ($this->getTipo() == "p"){
-            $this->dados = pg_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: ". pg_result_error());
-        }
+        $this->executar();
         if ($this->dados == true){
             $this->setRetorno("Alterado com sucesso...");
+        } else {
+            $this->setRetorno("Falha ao executar o comando Alterar...");
         }
     }
     
@@ -106,26 +100,39 @@ class Usuario extends Conexoes implements iCrud{
         } else {
             $this->strsql = ("select * from " . $this->tabela . " where nome='" . $this->getNome() . "'");
         }
-        if ($this->getTipo() == "m"){
-            $this->dados = mysqli_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: " . mysqli_error());
-            if (mysqli_num_rows($this->dados) > 0){
-                while ($row = mysqli_fetch_array($this->dados)){
-                    echo "<br/> Nome: ".$row["nome"]." -x- Senha: ".$row["senha"];
+        $this->executar();
+        switch ($this->getTipo()){
+            case "m":
+                if (mysqli_num_rows($this->dados) > 0){
+                    while ($row = mysqli_fetch_array($this->dados)){
+                        echo "<br/> Nome: ".$row["nome"]." -x- Senha: ".$row["senha"];
+                    }
+                    $this->setRetorno("<br/>Consultado com sucesso");
+                } else {
+                    $this->setRetorno("Nenhum registro encontrado");
                 }
-                $this->setRetorno("<br/>Consultado com sucesso");
-            } else {
-                $this->setRetorno("Nenhum registro encontrado");
-            }
-        } elseif ($this->getTipo() == "p"){
-            $this->dados = pg_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: " . pg_result_error());
-            if (pg_num_rows($this->dados) > 0){
-                while($row = pg_fetch_array($this->dados)){
-                    echo "<br/> Nome: ".$row["nome"]." -x- Senha: ".$row["senha"];
+                break;
+            case "p":
+                if (pg_num_rows($this->dados) > 0){
+                    while($row = pg_fetch_array($this->dados)){
+                        echo "<br/> Nome: ".$row["nome"]." -x- Senha: ".$row["senha"];
+                    }
+                    $this->setRetorno("<br/>Consultado com sucesso");
+                } else {
+                    $this->setRetorno("Nenhum registro encontrado");
                 }
-                $this->setRetorno("<br/>Consultado com sucesso");
-            } else {
-                $this->setRetorno("Nenhum registro encontrado");
-            }
+                break;
+        }
+    }
+    
+    private function executar() {
+        switch ($this->getTipo()){
+            case "m":
+                $this->dados = mysqli_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: ".mysqli_error());
+                break;
+            case "p":
+                $this->dados = pg_query($this->getConexao(), $this->strsql) or die("Erro na execução do comando: ". pg_result_error());
+                break;
         }
     }
 }

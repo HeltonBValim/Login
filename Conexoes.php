@@ -34,11 +34,11 @@ class Conexoes {
     protected $conexao;
     protected $retorno;
     
-    public function __construct() {
-        $this->setTipo("p"); #Define o tipo do banco que será usado pela aplicação.
+    final public function __construct() {
+        $this->setTipo("m"); #Define o tipo do banco que será usado pela aplicação.
     }
     
-    public function getTipo() {
+    final public function getTipo() {
         return $this->tipo;
     }
     
@@ -58,15 +58,18 @@ class Conexoes {
         return $this->conexao;
     }
     
-    public function conectar($simnao){
+    final public function conectar($simnao){
         /*Chama a function para conexão de acordo com o tipo de BD,
         informando se a conexão será efetuada (true) ou finalizada (false).*/
-        if ($this->getTipo() == "m"){
-            $this->cnxMySql($simnao);
-        } elseif ($this->getTipo() == "p"){
-            $this->cnxPostgre($simnao);
-        } else {
-            $this->setRetorno("Erro: Tipo de conexão desconhecido...");
+        switch ($this->getTipo()){
+            case "m":
+                $this->cnxMySql($simnao);
+                break;
+            case "p":
+                $this->cnxPostgre($simnao);
+                break;
+            default :
+                $this->setRetorno("Erro: Tipo de conexão desconhecido...");
         }
      }
     
